@@ -1,7 +1,10 @@
 import pandas as pd
 
 # Excelファイルの読み込み（Sheet1から）
-df = pd.read_excel('input_file.xlsx', sheet_name='Sheet1')
+df = pd.read_excel('/Users/mukaikazuhiro/Documents/kuronyan-sleep/excel_io/input_file.xlsx', sheet_name='Sheet1')
+
+# 年月日列を datetime 形式に変換
+df['年月日'] = pd.to_datetime(df['年月日'], format='%Y/%m/%d')
 
 # ユーザーに科目、年度、および所属を入力してもらう
 subject = input("出力したい科目を入力してください（例：国語、数学、英語など）: ")
@@ -18,12 +21,16 @@ else:
     if subject not in df['科目'].values or affiliation not in df['所属'].values:
         print(f"指定した科目「{subject}」、年度「{year}」、または所属「{affiliation}」はデータに存在しません。")
     else:
-        # 所属が指定された値、かつ指定された科目と年度のデータをフィルタリング
-        df_filtered = df[(df['所属'] == affiliation) & (df['科目'] == subject)]
+        # 所属が指定された値、かつ指定された科目のデータをフィルタリングし、コピーを作成
+        df_filtered = df[(df['所属'] == affiliation) & (df['科目'] == subject)].copy()
+
+        # 年度と月を抽出
+        df_filtered['年度'] = df_filtered['年月日'].dt.year
+        df_filtered['月'] = df_filtered['年月日'].dt.month
 
         # 4月から12月はその年（year）でフィルタリング、1月から3月は翌年（year+1）でフィルタリング
-        df_filtered_4_to_12 = df_filtered[(df_filtered['年'] == year) & (df_filtered['月'] >= 4) & (df_filtered['月'] <= 12)]
-        df_filtered_1_to_3 = df_filtered[(df_filtered['年'] == year + 1) & (df_filtered['月'] >= 1) & (df_filtered['月'] <= 3)]
+        df_filtered_4_to_12 = df_filtered[(df_filtered['年度'] == year) & (df_filtered['月'] >= 4) & (df_filtered['月'] <= 12)]
+        df_filtered_1_to_3 = df_filtered[(df_filtered['年度'] == year + 1) & (df_filtered['月'] >= 1) & (df_filtered['月'] <= 3)]
 
         # 両方のデータを結合
         df_filtered = pd.concat([df_filtered_4_to_12, df_filtered_1_to_3])

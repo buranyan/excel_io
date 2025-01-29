@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Excelファイルの読み込み（Sheet1から）
-df = pd.read_excel('/Users/mukaikazuhiro/Documents/kuronyan-sleep/excel_io/input_file.xlsx', sheet_name='Sheet1')
+df = pd.read_excel('/Users/user_name/Documents/GitHub/excel_io/input_file.xlsx', sheet_name='Sheet1')
 
 # 年月日列を datetime 形式に変換
 df['年月日'] = pd.to_datetime(df['年月日'], format='%Y/%m/%d')

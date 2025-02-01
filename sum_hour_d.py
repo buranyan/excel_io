@@ -8,7 +8,7 @@ dtype = {
     '科目': 'str'  # 科目列を文字列型
 }
 
-df = pd.read_excel('/Users/mukaikazuhiro/Documents/kuronyan-sleep/local_file/input_file.xlsx',
+df = pd.read_excel('/Users/user_name/Documents/GitHub/excel_io/input_file.xlsx',
                    usecols=['所属','氏名','年月日','科目','得点'],
                    dtype=dtype,
                    parse_dates=['年月日'])

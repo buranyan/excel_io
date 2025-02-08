@@ -3,7 +3,7 @@ import time
 
 # Excelファイルの読み込み（Sheet1から）
 start_time_r = time.time()
-df = pd.read_excel('/Users/user_name/Documents/GitHub/excel_io/input_file.xlsx', sheet_name='Sheet1')
+df = pd.read_excel('/Users/9108h/Documents/GitHub/excel_io/input_file.xlsx', sheet_name='Sheet1')
 end_time_r = time.time()
 print(f"ファイルの読み取り時間: {end_time_r - start_time_r:.6f} 秒")
 print(df.head(2))

@@ -3,7 +3,7 @@ import time
 
 # CSV読み込み
 start_time_r = time.time()
-df = pd.read_csv('/Users/user_name/Documents/GitHub/excel_io/input_file.csv')
+df = pd.read_csv('/Users/9108h/Documents/GitHub/excel_io/input_file.csv')
 end_time_r = time.time()
 print(f"ファイルの読み取り時間: {end_time_r - start_time_r:.6f} 秒")
 print(df.head(2))

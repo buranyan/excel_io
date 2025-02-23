@@ -1,26 +1,26 @@
 import pandas as pd
 import time
 
-def load_csv_data(file_path):
+def load_data(file_path):
     """CSVファイルを読み込み、DataFrameを返す"""
     try:
         start_time = time.time()
         print("<読み取り開始>")
-        df = pd.read_csv(file_path, encoding="utf-8")  # エンコーディングは適宜変更
+        df = pd.read_csv(file_path)
         print(f"<読み取り時間>: {time.time() - start_time:.6f} 秒")
         return df
     except FileNotFoundError:
         print(f"エラー: 指定されたCSVファイル '{file_path}' が見つかりません。")
         return None
-    except pd.errors.ParserError as e:
+    except ValueError as e:
         print(f"エラー: CSVの読み込み中に問題が発生しました - {e}")
         return None
 
 def validate_inputs():
     """ユーザー入力のバリデーション"""
-    datefmt = "%Y-%m-%d"  # ユーザー入力を省略し、固定フォーマットを使用
-    subject = input("出力したい工事番号を入力してください（例：国語、数学、英語など）: ").strip()
-    affiliation = input("出力したい所属を入力してください（例：D、A など）: ").strip()
+    datefmt = "%Y-%m-%d" # ユーザー入力を省略し、固定フォーマットを使用
+    subject = input("出力したい工事番号を入力してください（例：国語）: ").strip()
+    affiliation = input("出力したい所属を入力してください（例：D）: ").strip()
 
     while True:
         year_input = input("出力したい年度を入力してください（例：2024）: ").strip()
@@ -62,8 +62,10 @@ def analyze_data(df_filtered, year, subject, affiliation):
         print(f"指定した工事番号「{subject}」および年度「{year}」に対応するデータは存在しません。")
         return None
 
+    month_labels = {m: m if m <= 12 else m - 12 for m in range(4, 16)}
     grouped = df_filtered.groupby(['氏名', 'fiscal_month'])['実績工数'].sum().unstack(fill_value=0)
-    grouped = grouped.reindex(columns=range(4, 16), fill_value=0)
+    grouped.columns = [month_labels[m] for m in grouped.columns]
+    grouped = grouped.reindex(columns=[*range(4, 13), *range(1, 4)], fill_value=0)
     grouped['年間合計'] = grouped.sum(axis=1)
 
     total_row = grouped.sum(axis=0)
@@ -74,7 +76,7 @@ def analyze_data(df_filtered, year, subject, affiliation):
     grouped['年度'] = year
     grouped['所属'] = affiliation
 
-    return grouped.reset_index()
+    return grouped.reset_index().rename(columns={'index': '氏名'})
 
 def save_results(df_result, subject, year, affiliation):
     """結果をExcelに保存"""
@@ -88,9 +90,9 @@ def save_results(df_result, subject, year, affiliation):
         print(f"エラー: ファイルの保存中に問題が発生しました - {e}")
 
 def main():
-    file_path = 'panda.csv'  # CSVファイル名に変更
+    file_path = 'panda.csv'
 
-    df = load_csv_data(file_path)
+    df = load_data(file_path)
     if df is None:
         return
 

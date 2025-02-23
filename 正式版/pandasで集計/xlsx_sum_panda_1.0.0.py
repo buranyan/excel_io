@@ -18,9 +18,9 @@ def load_data(file_path, sheet_name):
 
 def validate_inputs():
     """ユーザー入力のバリデーション"""
-    datefmt = "%Y-%m-%d"  # ユーザー入力を省略し、固定フォーマットを使用
-    subject = input("出力したい工事番号を入力してください（例：国語、数学、英語など）: ").strip()
-    affiliation = input("出力したい所属を入力してください（例：D、A など）: ").strip()
+    datefmt = "%Y-%m-%d" # ユーザー入力を省略し、固定フォーマットを使用
+    subject = input("出力したい工事番号を入力してください（例：国語）: ").strip()
+    affiliation = input("出力したい所属を入力してください（例：D）: ").strip()
 
     while True:
         year_input = input("出力したい年度を入力してください（例：2024）: ").strip()
@@ -62,8 +62,10 @@ def analyze_data(df_filtered, year, subject, affiliation):
         print(f"指定した工事番号「{subject}」および年度「{year}」に対応するデータは存在しません。")
         return None
 
+    month_labels = {m: m if m <= 12 else m - 12 for m in range(4, 16)}
     grouped = df_filtered.groupby(['氏名', 'fiscal_month'])['実績工数'].sum().unstack(fill_value=0)
-    grouped = grouped.reindex(columns=range(4, 16), fill_value=0)
+    grouped.columns = [month_labels[m] for m in grouped.columns]
+    grouped = grouped.reindex(columns=[*range(4, 13), *range(1, 4)], fill_value=0)
     grouped['年間合計'] = grouped.sum(axis=1)
 
     total_row = grouped.sum(axis=0)
@@ -74,7 +76,7 @@ def analyze_data(df_filtered, year, subject, affiliation):
     grouped['年度'] = year
     grouped['所属'] = affiliation
 
-    return grouped.reset_index()
+    return grouped.reset_index().rename(columns={'index': '氏名'})
 
 def save_results(df_result, subject, year, affiliation):
     """結果をExcelに保存"""

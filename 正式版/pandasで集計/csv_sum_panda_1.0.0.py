@@ -6,7 +6,7 @@ def load_data(file_path):
     try:
         start_time = time.time()
         print("<読み取り開始>")
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, low_memory=False)
         print(f"<読み取り時間>: {time.time() - start_time:.6f} 秒")
         return df
     except FileNotFoundError:

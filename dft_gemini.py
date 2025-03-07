@@ -58,6 +58,7 @@ plt.title("Trapezoidal Wave (Power)")
 plt.xlabel("Time [µs]")
 plt.ylabel("Power [mW]")
 plt.xlim(0, duration * 1e6)  # 視認性のためパルス幅の2倍を表示
+plt.grid(True)
 
 # 周波数領域の信号 (パワースペクトル dBm)
 plt.subplot(2, 1, 2)

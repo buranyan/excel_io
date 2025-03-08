@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import math
 
 def trapezoidal_wave(t, rise_time, on_time, fall_time):
     """台形波を生成する関数（1周期に1回のみ）"""
@@ -49,7 +50,7 @@ power_spectrum_db = 10 * np.log10(power_spectrum + 1e-12)
 max_power_db = np.max(power_spectrum_db)
 
 # グラフの表示
-plt.figure(figsize=(5, 5))
+plt.figure(figsize=(10, 5))
 
 # 時間領域の信号 (電力)
 plt.subplot(2, 1, 1)
@@ -59,7 +60,6 @@ plt.xlabel("Time [µs]")
 plt.ylabel("Power [mW]")
 plt.xlim(0, duration * 1e6)  # 視認性のためパルス幅の2倍を表示
 plt.grid(True)
-plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(0.1))  # x軸を0.1 us刻みに設定
 plt.gca().yaxis.set_major_locator(ticker.MultipleLocator(0.1))  # y軸を0.1 mW刻みに設定
 
 # 周波数領域の信号 (パワースペクトル dBm)
@@ -69,7 +69,7 @@ plt.title(f"Power Spectrum (dBm), Max: {max_power_db:.2f} dBm")  # 最大値を�
 plt.xlabel("Frequency [MHz]")
 plt.ylabel("Power (dBm)")
 plt.xlim(-sampling_rate / 2 * 1e-6, sampling_rate / 2 * 1e-6)  # 折り返し周波数範囲
-plt.ylim(-120, 0)  # y軸の表示範囲
+plt.ylim(-120, math.ceil(max_power_db/10)*10)  # y軸の表示範囲
 plt.grid(True)
 plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(10))  # x軸を10 MHz刻みに設定
 plt.gca().yaxis.set_major_locator(ticker.MultipleLocator(10))  # y軸を10 dB刻みに設定

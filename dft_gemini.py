@@ -49,7 +49,7 @@ power_spectrum_db = 10 * np.log10(power_spectrum + 1e-12)
 max_power_db = np.max(power_spectrum_db)
 
 # グラフの表示
-plt.figure(figsize=(6, 6))
+plt.figure(figsize=(5, 5))
 
 # 時間領域の信号 (電力)
 plt.subplot(2, 1, 1)
@@ -66,7 +66,7 @@ plt.gca().yaxis.set_major_locator(ticker.MultipleLocator(0.1))  # y軸を0.1 mW�
 plt.subplot(2, 1, 2)
 plt.plot(frequencies * 1e-6, power_spectrum_db)  # 周波数をMHzで表示
 plt.title(f"Power Spectrum (dBm), Max: {max_power_db:.2f} dBm")  # 最大値をタイトルに表示
-plt.xlabel("Frequency [Hz]")
+plt.xlabel("Frequency [MHz]")
 plt.ylabel("Power (dBm)")
 plt.xlim(-sampling_rate / 2 * 1e-6, sampling_rate / 2 * 1e-6)  # 折り返し周波数範囲
 plt.ylim(-120, 0)  # y軸の表示範囲

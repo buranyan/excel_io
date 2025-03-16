@@ -15,8 +15,8 @@ R_on = 0.2      # FETのオン抵抗 (Ω)
 Vf = 0.7        # ダイオードの順方向電圧 (V)
 
 # スイッチング周波数とサンプリング時間
-fs = 100e3  # スイッチング周波数 (100 kHz)
-Ts = 1 / fs # サンプリング時間 (10 μs)
+fs = 1000e3  # スイッチング周波数 (1 MHz)
+Ts = 1 / fs  # サンプリング時間 (1 μs)
 
 # Buckコンバータの連続時間伝達関数 G(s)
 num = [D * Vin * (L * C)]  # 分子（デューティ比Dを考慮）
@@ -30,30 +30,14 @@ G_continuous = ctrl.TransferFunction(num, den)  # 連続時間伝達関数
 # Z変換（ゼロ次ホールドで離散化）
 G_discrete = ctrl.sample_system(G_continuous, Ts, method='zoh')
 
-# ボード線図のプロット
-omega = np.logspace(-2, 6, 1000)  # 周波数範囲（rad/s）
-mag, phase, w = ctrl.frequency_response(G_discrete, omega)
+# 周波数範囲の修正 (0.01 Hz から Nyquist 周波数の 95% 以下)
+omega_min = 2 * np.pi * 0.01  # 0.01 Hz -> rad/s
+omega_max = 0.95 * np.pi * fs  # Nyquist周波数の95% (rad/s)
+omega = np.logspace(np.log10(omega_min), np.log10(omega_max), 1000)  # rad/s
 
-# rad/s -> Hz に変換
-freq_Hz = w / (2 * np.pi)
-
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 6))
-
-# ゲイン線図
-ax1.semilogx(freq_Hz, 20 * np.log10(mag), label="Gain")
-ax1.set_title("Bode Plot")
-ax1.set_ylabel("Gain [dB]")
-ax1.grid(True, which="both", ls="--")
-ax1.set_xlim([10**-2, 10**6])
-
-# 位相線図
-ax2.semilogx(freq_Hz, phase * 180 / np.pi, label="Phase")
-ax2.set_xlabel("Frequency [Hz]")
-ax2.set_ylabel("Phase [deg]")
-ax2.grid(True, which="both", ls="--")
-ax2.set_xlim([10**-2, 10**6])
-ax2.set_ylim(-180, 180)
-plt.tight_layout()
+# ボード線図のプロット (離散系では ctrl.bode_plot を推奨)
+plt.figure(figsize=(8, 6))
+ctrl.bode_plot(G_discrete, omega, dB=True, Hz=True, deg=True)
 plt.show()
 
 # ダイオードの順方向電圧補正

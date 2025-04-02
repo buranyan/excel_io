@@ -1,0 +1,7 @@
+* 加算
+
+.subckt add in in+ out 
+
+B1 out 0 V={V(in) + V(in+)} 
+
+.ends add

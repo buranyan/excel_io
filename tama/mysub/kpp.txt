@@ -1,0 +1,7 @@
+* 位置比例ゲイン
+
+.subckt kpp in out 
+
+B1 out 0 V={V(in) * {kpp}} ; kppは外部パラメータ
+
+.ends kpp

@@ -1,0 +1,7 @@
+* 速度リミッタ
+
+.subckt v_lim in out 
+
+B1 out 0 V=LIMIT(V(in), {v_min}, {v_max}) 
+
+.ends v_lim

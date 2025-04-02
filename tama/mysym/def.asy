@@ -1,0 +1,20 @@
+Version 4
+SymbolType CELL
+CIRCLE Normal -48 48 48 -48
+WINDOW 3 -8 -24 Left 0
+WINDOW 38 0 -64 Center 2
+WINDOW -1 0 0 Left 0
+WINDOW -1 0 0 Left 0
+SYMATTR Value def
+SYMATTR SpiceModel def
+SYMATTR Prefix X
+SYMATTR ModelFile mysub/def.txt
+PIN -48 0 LEFT 8
+PINATTR PinName IN
+PINATTR SpiceOrder 1
+PIN 0 48 BOTTOM 8
+PINATTR PinName IN-
+PINATTR SpiceOrder 2
+PIN 48 0 RIGHT 8
+PINATTR PinName OUT
+PINATTR SpiceOrder 3

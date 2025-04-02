@@ -1,0 +1,9 @@
+* 積分回路 (BV使用) と並列抵抗
+
+.subckt integ in out 
+
+C1 out 0 1m ; 容量値は任意 (積分ゲインに影響)
+B1 out 0 I={-V(in) * 1m} ; 電圧制御電流源 (ゲイン調整)
+R1 out 0 1G ; 仮想的な大きな抵抗 (DCパス)
+
+.ends integ

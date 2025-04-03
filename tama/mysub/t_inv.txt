@@ -1,7 +1,0 @@
-* 反力トルク
-
-.subckt t_inv th1 th2 fn 
-
-B1 fn 0 V=(V(th1) - V(th2)) * {kgb} * (abs(V(th2) - V(th1)) - {dbrad}) 
-
-.ends t_inv

@@ -1,5 +1,0 @@
-.SUBCKT delay IN OUT
-
-B1 OUT 0 V = Delay(V(IN),0.0001)
-
-.ENDS delay

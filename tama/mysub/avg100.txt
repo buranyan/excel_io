@@ -1,7 +1,7 @@
 .SUBCKT avg100 IN OUT
 
 B1 OUT 0 V=
-+ (V(IN) + Delay(V(IN),0.001) + Delay(V(IN),0.002) + Delay(V(IN),0.003) + Delay(V(IN),0.004) + Delay(V(IN),0.005)
++ {V(IN) + Delay(V(IN),0.001) + Delay(V(IN),0.002) + Delay(V(IN),0.003) + Delay(V(IN),0.004) + Delay(V(IN),0.005)
 +          + Delay(V(IN),0.006) + Delay(V(IN),0.007) + Delay(V(IN),0.008) + Delay(V(IN),0.009) + Delay(V(IN),0.01)
 +          + Delay(V(IN),0.011) + Delay(V(IN),0.012) + Delay(V(IN),0.013) + Delay(V(IN),0.014) + Delay(V(IN),0.015)
 +          + Delay(V(IN),0.016) + Delay(V(IN),0.017) + Delay(V(IN),0.018) + Delay(V(IN),0.019) + Delay(V(IN),0.02)
@@ -20,6 +20,6 @@ B1 OUT 0 V=
 +          + Delay(V(IN),0.081) + Delay(V(IN),0.082) + Delay(V(IN),0.083) + Delay(V(IN),0.084) + Delay(V(IN),0.085)
 +          + Delay(V(IN),0.086) + Delay(V(IN),0.087) + Delay(V(IN),0.088) + Delay(V(IN),0.089) + Delay(V(IN),0.09)
 +          + Delay(V(IN),0.091) + Delay(V(IN),0.092) + Delay(V(IN),0.093) + Delay(V(IN),0.094) + Delay(V(IN),0.095)
-+          + Delay(V(IN),0.096) + Delay(V(IN),0.097) + Delay(V(IN),0.098) + Delay(V(IN),0.099) ) / 100
++          + Delay(V(IN),0.096) + Delay(V(IN),0.097) + Delay(V(IN),0.098) + Delay(V(IN),0.099) } / 100
 
 .ENDS avg100

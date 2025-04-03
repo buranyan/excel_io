@@ -2,6 +2,6 @@
 
 .subckt t_gen in out 
 
-B1 out 0 V = V(in) * ({JM} + {JL}) 
+B1 out 0 V = {V(in) * (JM + JL)} 
 
 .ends t_gen

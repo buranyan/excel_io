@@ -9,17 +9,14 @@ SYMATTR SpiceModel th2dt2
 SYMATTR Prefix X
 SYMATTR ModelFile mysub/th2dt2.txt
 PIN -48 -16 LEFT 8
-PINATTR PinName th1
+PINATTR PinName tha
 PINATTR SpiceOrder 1
 PIN -48 16 LEFT 8
-PINATTR PinName th2
+PINATTR PinName fn
 PINATTR SpiceOrder 2
 PIN 96 -16 RIGHT 8
 PINATTR PinName th2dt2
-PINATTR SpiceOrder 5
-PIN -48 48 LEFT 8
-PINATTR PinName fn
-PINATTR SpiceOrder 3
-PIN -48 80 LEFT 8
-PINATTR PinName th2dt1
 PINATTR SpiceOrder 4
+PIN -48 48 LEFT 8
+PINATTR PinName th2dt1
+PINATTR SpiceOrder 3

@@ -1,0 +1,9 @@
+* 反力トルク
+
+.subckt f_gen th1 th2 tha fn 
+
+B1 tha 0 V=abs(V(th2) - V(th1))
+
+B2 fn 0 V=-sgn(V(th2) - V(th1)) * kgb * (V(tha)  - dbrad) 
+
+.ends f_gen

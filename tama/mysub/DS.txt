@@ -1,0 +1,22 @@
+* パラメータ対応：クロック周期 T、ON時間 Ton 指定可
+.subckt DS in out params: T=0.1 Ton=1m
+
+* 内部電源
+Vdd Vdd_internal 0 DC 5
+
+* パラメータ式クロック生成（PULSE）
+Vclk clk_internal 0 PULSE(0 5 0 1p 1p {Ton} {T})
+
+* 積分器
+Rin in int_in 1
+Cint int_in 0 1n
+
+* スイッチ（クロックで制御）
+S1 int_in hold clk_internal 0 SW
+.model SW SW(Ron=1 Roff=1G Vt=2.5 Vh=0.1)
+
+* ホールド段
+Chold hold 0 10u
+Rload hold out 1k
+
+.ends DS

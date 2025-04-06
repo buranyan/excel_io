@@ -1,7 +1,7 @@
 * GB角加速度
 
-.subckt th1dt2 tq tha fn th1dt1 th1dt2 
+.subckt th1dt2 tq tha fn th1dt1 out 
 
-B1 th1dt2 0 V=if(V(tha) < dbrad, (V(tq) - DM * V(th1dt1))/JM, (V(tq) - DM * V(th1dt1) - V(fn))/ JM)
+B1 out 0 V=if(V(tha) < dbrad, (V(tq) - DM * V(th1dt1))/JM, (V(tq) - DM * V(th1dt1) - V(fn))/ JM)
 
 .ends th1dt2

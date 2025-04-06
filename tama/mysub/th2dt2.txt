@@ -1,7 +1,7 @@
 * AZ軸角加速度
 
-.subckt th2dt2 tha fn th2dt1 th2dt2 
+.subckt th2dt2 tha fn th2dt1 out 
 
-B1 th2dt2 0 V=if(V(tha) < dbrad, (- DL * V(th2dt1)) / JL, (V(fn) - DL * V(th2dt1)) / JL)
+B1 out 0 V=if(V(tha) < dbrad, (- DL * V(th2dt1)) / JL, (V(fn) - DL * V(th2dt1)) / JL)
 
 .ends th2dt2

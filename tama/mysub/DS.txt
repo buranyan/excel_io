@@ -18,5 +18,6 @@ S1 int_in hold clk_internal 0 SW
 * ホールド段
 Chold hold 0 10u
 Rload hold out 1k
+Ebuf out 0 VALUE { V(hold) } ; バッファとして出力安定化
 
 .ends DS

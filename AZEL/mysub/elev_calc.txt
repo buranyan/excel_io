@@ -1,0 +1,31 @@
+* サブサーキット: Elevation 計算
+* 入力: COS, SIN, theta, phi
+* 出力: EL
+
+.subckt elev_calc COS SIN theta phi EL
+
+* xe = cos(theta) * COS + sin(phi) * sin(theta) * SIN
+Bxe xe 0 V = cos(V(theta) * pi / 180) * V(COS) + sin(V(phi) * pi / 180) * sin(V(theta) * pi / 180) * V(SIN)
+
+* ye = cos(phi) * SIN
+Bye ye 0 V = cos(V(phi) * pi / 180) * V(SIN)
+
+* ze = -sin(theta) * COS + sin(phi) * cos(theta) * SIN
+Bze ze 0 V = -sin(V(theta) * pi / 180) * V(COS) + sin(V(phi) * pi / 180) * cos(V(theta) * pi / 180) * V(SIN)
+
+* r = sqrt(xe^2 + ye^2)
+Br r 0 V = sqrt(V(xe)*V(xe) + V(ye)*V(ye))
+
+* arccos(r) in rad, then convert to deg
+Barccos arccos 0 V = acos(V(r)) * 180 / pi
+
+* sign(ze)
+Bsign sgn 0 V = V(ze) >= 0 ? 1 : -1
+
+* el = sign(ze) * arccos(r)
+Bel el 0 V = V(sgn) * V(arccos)
+
+* 出力バッファ
+Rout EL el 1Meg
+
+.ends elev_calc

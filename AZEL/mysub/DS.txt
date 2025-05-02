@@ -1,0 +1,33 @@
+*=======================================
+* 高精度サンプル＆ホールド付き積分器
+* サブサーキット: DS_HiPrecision
+* パラメータ: T=周期, Ton=ON時間
+*=======================================
+
+.subckt DS in out params: T=0.1 Ton=0.1m
+
+* 内部電源
+Vdd Vdd_internal 0 DC 5
+
+* クロック信号（パラメータ式）
+Vclk clk_internal 0 PULSE(0 5 0 1p 1p {Ton} {T})
+
+* 積分器（RC）: 時定数は固定（ここでは1Ω×1nF = 1ns）
+Rin in int_in 1
+Cint int_in 0 1n
+
+* バッファ（理想ユニティゲインアンプ）
+Ebuf1 buf 0 VALUE { V(int_in) }
+
+* スイッチ（クロックで制御）
+S1 buf hold clk_internal 0 SW
+.model SW SW(Ron=1 Roff=1G Vt=2.5 Vh=0.1)
+
+* ホールド段（値を保持）
+Chold hold 0 10u
+Rload hold out_in 1k
+
+* バッファ（理想ユニティゲインアンプ）
+Ebuf2 out 0 VALUE { V(out_in) }
+.ends DS
+

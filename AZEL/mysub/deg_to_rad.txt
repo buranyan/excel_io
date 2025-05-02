@@ -1,0 +1,7 @@
+* deg to rad 変換
+
+.subckt deg_to_rad in out 
+
+B1 out 0 V= {V(in) * pi / 180}
+
+.ends deg_to_rad

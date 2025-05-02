@@ -1,0 +1,7 @@
+* 速度積分ゲイン
+
+.subckt kvi in out 
+
+B1 out 0 V={V(in) * kvi} ; kviは外部パラメータ
+
+.ends kvi

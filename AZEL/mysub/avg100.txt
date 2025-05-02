@@ -1,0 +1,25 @@
+.SUBCKT avg100 IN OUT
+
+B1 OUT 0 V=
++ {V(IN) + Delay(V(IN),0.001) + Delay(V(IN),0.002) + Delay(V(IN),0.003) + Delay(V(IN),0.004) + Delay(V(IN),0.005)
++          + Delay(V(IN),0.006) + Delay(V(IN),0.007) + Delay(V(IN),0.008) + Delay(V(IN),0.009) + Delay(V(IN),0.01)
++          + Delay(V(IN),0.011) + Delay(V(IN),0.012) + Delay(V(IN),0.013) + Delay(V(IN),0.014) + Delay(V(IN),0.015)
++          + Delay(V(IN),0.016) + Delay(V(IN),0.017) + Delay(V(IN),0.018) + Delay(V(IN),0.019) + Delay(V(IN),0.02)
++          + Delay(V(IN),0.021) + Delay(V(IN),0.022) + Delay(V(IN),0.023) + Delay(V(IN),0.024) + Delay(V(IN),0.025)
++          + Delay(V(IN),0.026) + Delay(V(IN),0.027) + Delay(V(IN),0.028) + Delay(V(IN),0.029) + Delay(V(IN),0.03)
++          + Delay(V(IN),0.031) + Delay(V(IN),0.032) + Delay(V(IN),0.033) + Delay(V(IN),0.034) + Delay(V(IN),0.035)
++          + Delay(V(IN),0.036) + Delay(V(IN),0.037) + Delay(V(IN),0.038) + Delay(V(IN),0.039) + Delay(V(IN),0.04)
++          + Delay(V(IN),0.041) + Delay(V(IN),0.042) + Delay(V(IN),0.043) + Delay(V(IN),0.044) + Delay(V(IN),0.045)
++          + Delay(V(IN),0.046) + Delay(V(IN),0.047) + Delay(V(IN),0.048) + Delay(V(IN),0.049) + Delay(V(IN),0.05)
++          + Delay(V(IN),0.051) + Delay(V(IN),0.052) + Delay(V(IN),0.053) + Delay(V(IN),0.054) + Delay(V(IN),0.055)
++          + Delay(V(IN),0.056) + Delay(V(IN),0.057) + Delay(V(IN),0.058) + Delay(V(IN),0.059) + Delay(V(IN),0.06)
++          + Delay(V(IN),0.061) + Delay(V(IN),0.062) + Delay(V(IN),0.063) + Delay(V(IN),0.064) + Delay(V(IN),0.065)
++          + Delay(V(IN),0.066) + Delay(V(IN),0.067) + Delay(V(IN),0.068) + Delay(V(IN),0.069) + Delay(V(IN),0.07)
++          + Delay(V(IN),0.071) + Delay(V(IN),0.072) + Delay(V(IN),0.073) + Delay(V(IN),0.074) + Delay(V(IN),0.075)
++          + Delay(V(IN),0.076) + Delay(V(IN),0.077) + Delay(V(IN),0.078) + Delay(V(IN),0.079) + Delay(V(IN),0.08)
++          + Delay(V(IN),0.081) + Delay(V(IN),0.082) + Delay(V(IN),0.083) + Delay(V(IN),0.084) + Delay(V(IN),0.085)
++          + Delay(V(IN),0.086) + Delay(V(IN),0.087) + Delay(V(IN),0.088) + Delay(V(IN),0.089) + Delay(V(IN),0.09)
++          + Delay(V(IN),0.091) + Delay(V(IN),0.092) + Delay(V(IN),0.093) + Delay(V(IN),0.094) + Delay(V(IN),0.095)
++          + Delay(V(IN),0.096) + Delay(V(IN),0.097) + Delay(V(IN),0.098) + Delay(V(IN),0.099) } / 100
+
+.ENDS avg100

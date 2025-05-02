@@ -1,0 +1,7 @@
+* 減算
+
+.subckt sub in in- out 
+
+B1 out 0 V={V(in) - V(in-)} 
+
+.ends sub

@@ -1,0 +1,7 @@
+* トルクリミッタ
+
+.subckt t_lim in out 
+
+B1 out 0 V=LIMIT(V(in), t_min, t_max) 
+
+.ends t_lim

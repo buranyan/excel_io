@@ -1,0 +1,7 @@
+* deg to cos
+
+.subckt cos_gen in out 
+
+B1 out 0 V= {cos(V(in) / 180 * pi)}
+
+.ends cos_gen

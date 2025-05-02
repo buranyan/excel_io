@@ -1,0 +1,7 @@
+* AZ軸角加速度＋自重トルク考慮
+
+.subckt th2dt2_el tha fn th2dt1 out 
+
+B1 out 0 V=if(V(tha) < dbrad, (- DL * V(th2dt1) - owntq) / JL, (V(fn) - DL * V(th2dt1) -owntq) / JL)
+
+.ends th2dt2_el

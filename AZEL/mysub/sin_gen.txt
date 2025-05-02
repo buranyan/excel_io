@@ -1,0 +1,7 @@
+* deg to sin
+
+.subckt sin_gen in out 
+
+B1 out 0 V= {sin(V(in) / 180 * pi)}
+
+.ends sin_gen

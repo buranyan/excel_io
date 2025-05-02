@@ -1,0 +1,5 @@
+.SUBCKT shape IN OUT
+
+B1 OUT 0 V=if((time/0.1 > int(mtime/0.1)) == 0, V(IN), if((time/0.1 > int(mtime/0.1) + 1) == 0, mtrrad * ((mtime/0.1) - int(mtime/0.1)), 0))
+
+.ENDS shape

@@ -1,0 +1,7 @@
+* 速度比例ゲイン
+
+.subckt kvp in out 
+
+B1 out 0 V={V(in) * kvp} ; kvpは外部パラメータ
+
+.ends kvp

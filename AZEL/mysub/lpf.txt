@@ -1,0 +1,17 @@
+*===========================
+* サブサーキット: lpf
+* 使用方法: X1 in out lpf PARAMS: fcut=100等
+*===========================
+
+.subckt lpf in out
+
+.param pi = 3.14159265359
+*.param fcut = 10
+.param RVAL = 1k
+.param CVAL = 1 / (2 * pi * fcut * RVAL)
+
+R1 in n1 {RVAL}
+C1 n1 0 {CVAL}
+Ebuf out 0 VALUE { V(n1) }
+
+.ends lpf

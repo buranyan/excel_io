@@ -1,0 +1,7 @@
+* EL減速比
+
+.subckt gear_el in out 
+
+B1 out 0 V= {V(in) * gretio_el} ; gretio_elは外部パラメータ
+
+.ends gear_el

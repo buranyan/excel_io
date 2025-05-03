@@ -1,0 +1,101 @@
+【3X3行列3個の掛け算】
+\begin{bmatrix}
+\cos\psi & -\sin\psi & 0 \\
+\sin\psi & \cos\psi & 0 \\
+0 & 0 & 1
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+\cos\theta & 0 & \sin\theta \\
+0 & 1 & 0 \\
+-\sin\theta & 0 & \cos\theta
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & \cos\phi & -\sin\phi \\
+0 & \sin\phi & \cos\phi
+\end{bmatrix}
+
+【掛け算の結果】
+=
+\begin{bmatrix}
+\cos\theta \cos\psi & 
+\sin\phi \sin\theta \cos\psi - \cos\phi \sin\psi & 
+\cos\phi \sin\theta \cos\psi + \sin\phi \sin\psi \\
+\cos\theta \sin\psi & 
+\sin\phi \sin\theta \sin\psi + \cos\phi \cos\psi & 
+\cos\phi \sin\theta \sin\psi - \sin\phi \cos\psi \\
+-\sin\theta & 
+\sin\phi \cos\theta & 
+\cos\phi \cos\theta
+\end{bmatrix}
+
+【方程式の形】
+\begin{bmatrix}
+x_e \\
+y_e \\
+z_e
+\end{bmatrix}
+=
+\begin{bmatrix}
+\cos\theta \cos\psi & 
+\sin\phi \sin\theta \cos\psi - \cos\phi \sin\psi & 
+\cos\phi \sin\theta \cos\psi + \sin\phi \sin\psi \\
+\cos\theta \sin\psi & 
+\sin\phi \sin\theta \sin\psi + \cos\phi \cos\psi & 
+\cos\phi \sin\theta \sin\psi - \sin\phi \cos\psi \\
+-\sin\theta & 
+\sin\phi \cos\theta & 
+\cos\phi \cos\theta
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+U \\
+V \\
+W
+\end{bmatrix}
+
+【WordでLaTeX記法を使う方法（Microsoft Word 2016以降）】
+
+手順：
+Wordを開く
+数式を入力したい場所でカーソルを置く
+キーボードで次のキーを押す：
+Alt + =
+すると、数式モード（Equation Editor）が開きます。
+数式モード内で、LaTeX記法をそのまま入力できます：
+
+\begin{bmatrix}
+\cos\theta \cos\psi & 
+\sin\phi \sin\theta \cos\psi - \cos\phi \sin\psi & 
+\cos\phi \sin\theta \cos\psi + \sin\phi \sin\psi \\
+\cos\theta \sin\psi & 
+\sin\phi \sin\theta \sin\psi + \cos\phi \cos\psi & 
+\cos\phi \sin\theta \sin\psi - \sin\phi \cos\psi \\
+-\sin\theta & 
+\sin\phi \cos\theta & 
+\cos\phi \cos\theta
+\end{bmatrix}
+
+入力が終わったら、Enterキーを押すと整形された数式になります。
+
+【WORD用入力方法まとめ】
+
+\matrix{...}：行列本体（& で列、\cr で行を区切る）
+\left[ ... \right]：bmatrix の代替
+----------------------------------------------------
+\left[ \matrix{x_e \cr y_e \cr z_e} \right] =
+\left[ \matrix{
+\cos\theta \cos\psi &
+\sin\phi \sin\theta \cos\psi - \cos\phi \sin\psi &
+\cos\phi \sin\theta \cos\psi + \sin\phi \sin\psi \cr
+\cos\theta \sin\psi &
+\sin\phi \sin\theta \sin\psi + \cos\phi \cos\psi &
+\cos\phi \sin\theta \sin\psi - \sin\phi \cos\psi \cr
+-\sin\theta &
+\sin\phi \cos\theta &
+\cos\phi \cos\theta
+} \right]
+\cdot
+\left[ \matrix{U \cr V \cr W} \right]

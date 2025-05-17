@@ -12,9 +12,9 @@ tp = 20
 tc = tp - ta
 psi_yaw = 30
 az_center = 30 #セクタースキャン方位角の中央値
-theta_pitch = 10
+theta_pitch = 0
 phi_roll = 20
-elev_ang = 0
+elev_ang = -20
 
 gretio_el = 480 #100だと負荷が見えてくる。
 owntq = 2.51 / gretio_el
@@ -48,17 +48,19 @@ sample_n = int(sample_time / dt) # サンプリング数/期間
 
 # 連続回転時のAZ角速度
 @njit
-def az_v_rotate_deg_numba(t):
+def az_v_r_deg_numba(t):
     if 1 <= t <= 1 + ta:
-        return 0
-    elif 1 + ta < t <= 1 + tc:
-        return 0
+        return aza_d * (t - 1)
+    elif 1 + ta < t <= 1 + ta + tc:
+        return azv_d
+    elif 1 + ta + tc < t <= 1 + tc + 2 * ta:
+        return -aza_d * (t - (1 + ta + tc)) + azv_d
     else:
         return 0
         
-# セクタースキャン時のAZ角速度
+# セクタースキャン幅60deg時のAZ角速度
 @njit
-def az_v_sector_deg_numba(t):
+def az_v_s_60deg_numba(t):
     if 0 <= t <= 1:
         return 0
     elif 1 < t <= 1 + ta:
@@ -81,6 +83,32 @@ def az_v_sector_deg_numba(t):
         return aza_d / 2 * (t - (1 + 12 * ta))
     elif 1 + 13 * ta < t <= 1 + 14 * ta:
         return -aza_d / 2 *(t - (1 + 13 * ta)) + azv_d / 2
+    else:
+        return 0
+
+# セクタースキャン幅180deg時のAZ角速度
+@njit
+def az_v_s_180deg_numba(t):
+    if 0 <= t <= 1:
+        return 0
+    elif 1 < t <= 1 + ta:
+        return aza_d / 2 * (t  - 1)
+    elif 1 + ta < t <= 1 + 3 * ta:
+        return azv_d / 2
+    elif 1 + 3 * ta < t <= 1 + 4 * ta:
+        return -aza_d / 2 * (t - (1 + 3 * ta)) + azv_d / 2
+    elif 1 + 4 * ta < t <= 1 + 5 * ta:
+        return -aza_d * (t - (1 + 4 *ta))
+    elif 1 + 5 * ta < t <= 1 + 7 * ta:
+        return -azv_d
+    elif 1 + 7 * ta < t <= 1 + 8 * ta:
+        return aza_d * (t - (1 + 7 * ta)) - azv_d
+    elif 1 + 8 * ta < t <= 1 + 9 * ta:
+        return aza_d / 2 * (t - (1 + 8 * ta))
+    elif 1 + 9 * ta < t <= 1 + 11 * ta:
+        return azv_d / 2
+    elif 1 + 11 * ta < t <= 1 + 12* ta:
+        return -aza_d / 2 * (t - (1 + 11 * ta)) + azv_d /2
     else:
         return 0
 
@@ -155,6 +183,7 @@ def lpf_numba(x, y_prev, dt, fc):
     y = alpha * x + (1 - alpha) * y_prev
     return y
 
+# サンプルホールド
 @njit
 def sh_numba(inp, hold_p, i_n, sample_n):
     if i_n % sample_n == 0:
@@ -176,10 +205,10 @@ def simulate_numba(
     az_p_deg = 0.0 # AZ角度
     az_p_sh_deg = 0.0 # AZ角度（サンプルホールド後）
     v_int = 0.0 # 速度積分
-    th1 = 0.0
-    th1dt1 = 0.0
-    th2 = 0.0
-    th2dt1 = 0.0
+    th1 = 0.0 # モータ角度
+    th1dt1 = 0.0 # モータ角速度
+    th2 = 0.0 # モータ軸換算負荷角度
+    th2dt1 = 0.0 # モータ軸換算負荷角速度
     y_prev_lpf = 0.0 # LPF
     
     th1_hist = np.zeros(steps)
@@ -187,51 +216,54 @@ def simulate_numba(
     th2_hist = np.zeros(steps)
     th2dt1_hist = np.zeros(steps)
     tq_hist = np.zeros(steps)
-    az_v_s_d_hist = np.zeros(steps)
+    az_v_d_hist = np.zeros(steps)
+    az_p_d_hist = np.zeros(steps)
     el_cmd_d_hist = np.zeros(steps)
 
     # ループ計算
     for i in range(steps):
         ts = i * dt
-        az_v_rotate_deg_val = az_v_rotate_deg_numba(ts)
-        az_v_sector_deg_val = az_v_sector_deg_numba(ts)
-        
-        theta_pitch_val = theta_pitch_func_numba(ts)
-        phi_roll_val = phi_roll_func_numba(ts)
-        elev_ang_val = elev_ang_func_numba(ts)
+        # 連続回転/セクター幅60度/セクター幅180度を選択する。
+        az_v_deg_val = az_v_r_deg_numba(ts) # 連続回転
+        # az_v_deg_val = az_v_s_60deg_numba(ts) # セクター幅60度
+        # az_v_deg_val = az_v_s_180deg_numba(ts) # セクター幅180度
 
-        az_p_deg = integ_numba(az_v_sector_deg_val, az_p_deg, dt)
-        az_p_sh_deg = sh_numba(az_p_deg, az_p_sh_deg, i, sample_n)
-        az_cmd_deg = az_p_sh_deg + az_center - psi_yaw 
+        theta_pitch_val = theta_pitch_func_numba(ts) # ピッチ角
+        phi_roll_val = phi_roll_func_numba(ts) # ロール角
+        elev_ang_val = elev_ang_func_numba(ts) # ヨー角
+
+        az_p_deg = integ_numba(az_v_deg_val, az_p_deg, dt) # AZ角度
+        az_p_sh_deg = sh_numba(az_p_deg, az_p_sh_deg, i, sample_n) # AZ角度
+        az_cmd_deg = az_p_sh_deg + az_center - psi_yaw
         # AZ角度作成 = セクタースキャン角度幅 + 方位角中央値 - ヨー角
         
-        cos_az_p = np.cos(az_cmd_deg / 180 * np.pi)
-        sin_az_p = np.sin(az_cmd_deg / 180 * np.pi)
+        cos_az_p = np.cos(az_cmd_deg / 180 * np.pi) # 空中線正面方向ベクトルのX軸成分
+        sin_az_p = np.sin(az_cmd_deg / 180 * np.pi) # 空中線正面方向ベクトルのY軸成分
         
         el_calc_deg = elev_calc_numba(cos_az_p, sin_az_p, theta_pitch_val, phi_roll_val)
-        el_cmd_deg = el_calc_deg + elev_ang_val
+        el_cmd_deg = el_calc_deg + elev_ang_val # 計算結果 + 仰角
         el_cmd_rad = el_cmd_deg / 180 * np.pi
-        mtr_rad = gretio_el * el_cmd_rad   
+        mtr_rad = gretio_el * el_cmd_rad # モータ軸に換算  
 
-        v_limit = v_limiter_numba(kpp * (mtr_rad - th1))
-        v_err = v_limit - th1dt1
-        v_int = integ_numba(v_err, v_int, dt)
-        tq = t_limiter_numba((kvi * v_int + v_err) * kvp* (JM + JL))
-        tq = lpf_numba(tq, y_prev_lpf, dt, fc)    
-        tha = np.abs(th2 - th1)
-        fn = -np.sign(th2 - th1) * kgb * (tha - dbrad)
+        v_limit = v_limiter_numba(kpp * (mtr_rad - th1)) # 角速度リミッター
+        v_err = v_limit - th1dt1 # 角速度誤差
+        v_int = integ_numba(v_err, v_int, dt) # 角速度誤差の積分
+        tq = t_limiter_numba((kvi * v_int + v_err) * kvp* (JM + JL)) # トルク発生
+        tq = lpf_numba(tq, y_prev_lpf, dt, fc) # LPF
+        tha = np.abs(th2 - th1) # 負荷軸とモータ軸角度の差
+        fn = -np.sign(th2 - th1) * kgb * (tha - dbrad) # ギヤのバネモデルによる反力
         
-        if tha < dbrad:
-            th1dt2 = (tq - DM * th1dt1) / (JM + 1e-9)
-            th2dt2 = (- DL * th2dt1 - owntq) / (JL + 1e-9)
+        if tha < dbrad: # 角度がギヤのバックラッシより小さい時
+            th1dt2 = (tq - DM * th1dt1) / (JM + 1e-9) # モータ軸角加速度
+            th2dt2 = (- DL * th2dt1 - owntq) / (JL + 1e-9) # 負荷軸モータ軸換算加速度
         else:
             th1dt2 = (tq - DM * th1dt1 - fn) / (JM + 1e-9)
             th2dt2 = (fn - DL * th2dt1 - owntq) / (JL + 1e-9)
         
-        th1dt1 = integ_numba(th1dt2, th1dt1, dt)
-        th1  = integ_numba(th1dt1, th1, dt)
-        th2dt1 = integ_numba(th2dt2, th2dt1, dt)
-        th2  = integ_numba(th2dt1, th2, dt)
+        th1dt1 = integ_numba(th1dt2, th1dt1, dt) # 角加速度を積分して角速度を計算
+        th1  = integ_numba(th1dt1, th1, dt) # 角速度を積分して角度を計算
+        th2dt1 = integ_numba(th2dt2, th2dt1, dt) # 角加速度を積分して角速度を計算
+        th2  = integ_numba(th2dt1, th2, dt) # 角速度を積分して角度を計算
 
         # 記録
         th1_hist[i] = th1
@@ -240,21 +272,22 @@ def simulate_numba(
         th2dt1_hist[i] = th2dt1
         tq_hist[i] = tq
         el_cmd_d_hist[i] = el_cmd_deg
-        az_v_s_d_hist[i] = az_v_sector_deg_val
+        az_v_d_hist[i] = az_v_deg_val
+        az_p_d_hist[i] = az_p_sh_deg
 
-    return az_v_s_d_hist, el_cmd_d_hist, tq_hist, th1_hist, th2_hist
+    return az_v_d_hist, az_p_d_hist, el_cmd_d_hist, tq_hist, th1_hist, th2_hist
 
 # =======================
 # 実行 & 可視化
 # =======================
-az_v_s_d_hist, el_cmd_d_hist, tq_hist, th1_hist, th2_hist = simulate_numba(
+az_v_d_hist, az_p_d_hist, el_cmd_d_hist, tq_hist, th1_hist, th2_hist = simulate_numba(
     steps, dt, azv_d, aza_d, ta, tc, theta_pitch, phi_roll, elev_ang,
     gretio_el, owntq, JM, DM, JL, DL, kgb, dbrad, kpp, kvp, kvi, v_min_val,
     v_max_val, t_min_val, t_max_val, fc, sample_n)
 
 time = np.linspace(0, sim_time, steps)
 
-fig, axs = plt.subplots(2, 2, figsize=(8, 5)) # 2行2列
+fig, axs = plt.subplots(2, 2, figsize=(8, 6)) # 2行2列
 
 # 左上：el_cmd_deg, th2_deg
 axs[0, 0].plot(time, el_cmd_d_hist, label='el_cmd_deg')
@@ -276,10 +309,12 @@ axs[0, 1].legend()
 axs[0, 1].grid(True)
 
 # 左下：az_p_deg
-axs[1, 0].plot(time, az_v_s_d_hist, label='az_v_s_deg')
-axs[1, 0].set_title('az_v_s_deg')
+axs[1, 0].plot(time, az_v_d_hist, label='az_v_deg')
+axs[1, 0].plot(time, az_p_d_hist, label='az_p_deg')
+axs[1, 0].set_title('az_v_deg/az_p_deg')
 axs[1, 0].set_xlabel('Time [s]')
-axs[1, 0].set_ylabel('Angle [deg]')
+axs[1, 0].set_ylabel('Angle v [deg/s] p [deg]')
+axs[1, 0].set_yticks(np.arange(-90, 725, 45))  # 0.01度刻み
 axs[1, 0].legend()
 axs[1, 0].grid(True)
 
@@ -295,5 +330,5 @@ axs[1, 1].grid(True)
 
 # 全体レイアウト調整と保存
 plt.tight_layout()
-plt.savefig("simulation_results.png", dpi=300)
+plt.savefig("sim_results.png", dpi=600)
 plt.show()

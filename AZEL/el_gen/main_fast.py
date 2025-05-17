@@ -10,9 +10,11 @@ aza_d = 21.6
 ta = azv_d / aza_d
 tp = 20
 tc = tp - ta
+psi_yaw = 30
+az_center = 30 #セクタースキャン方位角の中央値
 theta_pitch = 10
 phi_roll = 20
-elev_ang = -20
+elev_ang = 0
 
 gretio_el = 480 #100だと負荷が見えてくる。
 owntq = 2.51 / gretio_el
@@ -122,7 +124,7 @@ def integ_numba(inp, prev_state, dt):
     new_state = prev_state + inp * dt
     return new_state
 
-# 座標変換（オイラー角）
+# 座標変換（機体と地面のxy面の角度差を計算）
 @njit
 def elev_calc_numba(COS, SIN, theta, phi):
     xe = np.cos(theta * np.pi / 180) * COS + np.sin(phi * np.pi / 180) * np.sin(theta * np.pi / 180) * SIN
@@ -200,9 +202,11 @@ def simulate_numba(
 
         az_p_deg = integ_numba(az_v_sector_deg_val, az_p_deg, dt)
         az_p_sh_deg = sh_numba(az_p_deg, az_p_sh_deg, i, sample_n)
+        az_cmd_deg = az_p_sh_deg + az_center - psi_yaw 
+        # AZ角度作成 = セクタースキャン角度幅 + 方位角中央値 - ヨー角
         
-        cos_az_p = np.cos(az_p_sh_deg / 180 * np.pi)
-        sin_az_p = np.sin(az_p_sh_deg / 180 * np.pi)
+        cos_az_p = np.cos(az_cmd_deg / 180 * np.pi)
+        sin_az_p = np.sin(az_cmd_deg / 180 * np.pi)
         
         el_calc_deg = elev_calc_numba(cos_az_p, sin_az_p, theta_pitch_val, phi_roll_val)
         el_cmd_deg = el_calc_deg + elev_ang_val
@@ -250,7 +254,7 @@ az_v_s_d_hist, el_cmd_d_hist, tq_hist, th1_hist, th2_hist = simulate_numba(
 
 time = np.linspace(0, sim_time, steps)
 
-fig, axs = plt.subplots(2, 2, figsize=(9, 6))  # 2行2列
+fig, axs = plt.subplots(2, 2, figsize=(8, 5)) # 2行2列
 
 # 左上：el_cmd_deg, th2_deg
 axs[0, 0].plot(time, el_cmd_d_hist, label='el_cmd_deg')

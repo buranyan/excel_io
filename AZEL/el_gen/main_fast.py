@@ -11,7 +11,7 @@ ta = azv_d / aza_d # AZ加速時間[s]
 tp = 20 # 連続回転時、一定角速度に換算した場合のAZ回転時間[s]
 tc = tp - ta # AZ加速時間を引き算して、一定角速度の期間を計算[s]
 psi_yaw = 0 # ヨー角[deg]
-az_center = 90 #セクタースキャン方位角の中央値[deg]
+az_center = 0 #セクタースキャン方位角の中央値[deg]
 theta_pitch = 0 # ピッチ角[deg]
 phi_roll = 20 # ロール角[deg]
 elev_ang = 0 # 仰角設定値[deg]
@@ -26,7 +26,7 @@ DL_el = 0.005 / gretio_el**2 # モータ軸換算負荷粘性係数[Nm/(rad/s)]
 kgb_el = 1000 # バネ係数
 dbdeg_el = 0.1 # バックラッシ[deg]
 dbrad_el = dbdeg_el * np.pi / 180 # バックラッシ[rad]
-kpp_el = 30 # 位置比例ゲイン
+kpp_el = 120 # 位置比例ゲイン
 kvp_el = 90 # 速度比例ゲイン
 kvi_el = 30 # 速度積分ゲイン
 v_lim_val_el = 5000 / 60 * 2 * np.pi # 角速度リミット値[rad/s]
@@ -38,17 +38,17 @@ t_max_val_el = t_lim_val_el
 fc_el = 100 # LPFのカットオフ周波数[Hz]
 
 # AZ
-gretio_az = 480 #　AZギヤ比。100だと負荷が見えてくる。
+gretio_az = 100 #　AZギヤ比。100だと負荷が見えてくる。
 JM_az = 6.4e-7 # モータイナーシャ[kgm2]
 DM_az = 1.0e-5 # モータ粘性係数[Nm/(rad/s)]
-JL_az = 10 / gretio_az**2 # モータ軸換算負荷イナーシャ[kgm2]
-DL_az = 10 / gretio_az**2 # モータ軸換算負荷粘性係数[Nm/(rad/s)]
+JL_az = 0.1 / gretio_az**2 # モータ軸換算負荷イナーシャ[kgm2]
+DL_az = 0.005 / gretio_az**2 # モータ軸換算負荷粘性係数[Nm/(rad/s)]
 kgb_az = 1000 # バネ係数
 dbdeg_az = 0.1 # バックラッシ[deg]
 dbrad_az = dbdeg_az * np.pi / 180 # バックラッシ[rad]
-kpp_az = 90 # 位置比例ゲイン
-kvp_az = 9 # 速度比例ゲイン
-kvi_az = 3 # 速度積分ゲイン
+kpp_az = 360 # 位置比例ゲイン
+kvp_az = 30 # 速度比例ゲイン
+kvi_az = 10 # 速度積分ゲイン
 v_lim_val_az = 5000 / 60 * 2 * np.pi # 角速度リミット値[rad/s]
 v_min_val_az = -v_lim_val_az
 v_max_val_az = v_lim_val_az
@@ -61,22 +61,34 @@ fc_az = 100 # LPFのカットオフ周波数[Hz]
 sim_time = 30 # 計算時間[s]
 dt = 10e-6 # 10e-6 刻み値[s]
 steps = int(sim_time / dt) # 全計算数
-sample_time = 1e-3 # 1e-3 サンプリング期間[s]
+sample_time = 0.1e-3 # 1e-3 サンプリング期間[s]
 sample_n = int(sample_time / dt) # サンプリング数/期間
 
 # =======================
 # 入力信号の定義
 # =======================
 
-# 連続回転時のAZ角速度
+# 連続回転時のAZ角速度(6rpm)
 @njit
-def az_v_r_deg_numba(t):
+def az_v_6rpm_deg_numba(t):
     if 1 <= t <= 1 + ta:
         return aza_d * (t - 1)
     elif 1 + ta < t <= 1 + ta + tc:
         return azv_d
     elif 1 + ta + tc < t <= 1 + tc + 2 * ta:
         return -aza_d * (t - (1 + ta + tc)) + azv_d
+    else:
+        return 0
+
+# 連続回転時のAZ角速度(30rpm)
+@njit
+def az_v_30rpm_deg_numba(t):
+    if 1 <= t <= 1 + 5 * ta:
+        return aza_d * (t - 1)
+    elif 1 + 5 * ta < t <= 5 + 5 * ta:
+        return 5 * azv_d
+    elif 5 + 5 * ta < t <= 5 + 10 * ta:
+        return -aza_d * (t - (5 + 5 * ta)) + 5 * azv_d
     else:
         return 0
         
@@ -283,8 +295,9 @@ def simulate_numba(
     for i in range(steps):
         ts = i * dt
         # 連続回転/セクター幅60度/セクター幅180度を選択する。
-        # az_v_deg_val = az_v_r_deg_numba(ts) # 連続回転
-        az_v_deg_val = az_v_s_60deg_numba(ts) # セクター幅60度
+        # az_v_deg_val = az_v_6rpm_deg_numba(ts) # 連続回転(6rpm)
+        az_v_deg_val = az_v_30rpm_deg_numba(ts) # 連続回転(30rpm)
+        # az_v_deg_val = az_v_s_60deg_numba(ts) # セクター幅60度
         # az_v_deg_val = az_v_s_180deg_numba(ts) # セクター幅180度
 
         theta_pitch_val = theta_pitch_func_numba(ts) # ピッチ角
@@ -418,7 +431,7 @@ axs[0, 2].set_title('AZ_Delta_Angles')
 axs[0, 2].set_xlabel('Time [s]')
 axs[0, 2].set_ylabel('Angle [deg]')
 axs[0, 2].set_xticks(np.arange(0, 31, 5)) # 5秒刻み
-axs[0, 2].set_yticks(np.arange(-2, 2.1, 0.4)) # 0.2度刻み
+# axs[0, 2].set_yticks(np.arange(-2, 2.1, 0.4)) # 0.2度刻み
 axs[0, 2].legend()
 axs[0, 2].grid(True)
 
@@ -429,7 +442,7 @@ axs[1, 0].set_title('az_v_deg/az_cmd_deg')
 axs[1, 0].set_xlabel('Time [s]')
 axs[1, 0].set_ylabel('Angle v [deg/s] p [deg]')
 axs[1, 0].set_xticks(np.arange(0, 31, 5)) # 5秒刻み
-axs[1, 0].set_yticks(np.arange(-90, 725, 45)) # 45度刻み
+axs[1, 0].set_yticks(np.arange(-90, 2311, 180)) # 180度刻み
 axs[1, 0].legend()
 axs[1, 0].grid(True)
 
